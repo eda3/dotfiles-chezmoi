@@ -1,0 +1,7 @@
+{{ if eq .chezmoi.os "windows" -}}
+$src = "$env:USERPROFILE\.config\helix\config.toml"
+$dst = "$env:APPDATA\helix\config.toml"
+New-Item -ItemType Directory -Force -Path (Split-Path $dst) | Out-Null
+Copy-Item $src $dst -Force
+Write-Host "Helix config copied to %APPDATA%\helix\"
+{{ end -}}

@@ -1,13 +1,15 @@
+
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    新品Windows PC ブートストラップスクリプト
+    新品Windows PC 下準備スクリプト（bootstrap.nu 実行前の土台づくり）
 .DESCRIPTION
-    XDG環境変数設定 → git/chezmoi導入 → chezmoiでdotfiles展開
+    winget前提チェック → XDG環境変数設定 → nushell導入
+    この後 `nu bootstrap.nu` を実行してツール導入＋chezmoi展開へ
 .USAGE
-    irm https://raw.githubusercontent.com/eda3/dotfiles/master/bootstrap.ps1 | iex
+    irm https://raw.githubusercontent.com/eda3/dotfiles-chezmoi/master/install_nu.ps1 | iex
+    その後: nu bootstrap.nu
 #>
-
 # コケたら止める（原因箇所が分かる）
 $ErrorActionPreference = 'Stop'
 
@@ -26,8 +28,8 @@ function Update-SessionPath {
 # ============================================
 function Ensure-Tool {
     param(
-        [Parameter(Mandatory)][string] $Command,   # 確認するコマンド名 (例: git)
-        [Parameter(Mandatory)][string] $WingetId    # wingetのID (例: Git.Git)
+        [Parameter(Mandatory)][string] $Command,   # 確認するコマンド名 (例: nu)
+        [Parameter(Mandatory)][string] $WingetId    # wingetのID (例: Nushell.Nushell)
     )
     if (Get-Command $Command -ErrorAction SilentlyContinue) {
         Write-Host "[skip] $Command は既に導入済み" -ForegroundColor DarkGray
@@ -54,8 +56,8 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
 Write-Host "[ok] winget 利用可能" -ForegroundColor Green
 
 # ============================================
-# ① XDG Base Directory 環境変数
-#    永続（Userスコープ）＋ セッション内即反映（$env:）を併記
+# XDG Base Directory 環境変数
+#    永続（User スコープ）＋ セッション内即反映（$env:）を併記
 # ============================================
 Write-Host "`n=== XDG 環境変数を設定 ===" -ForegroundColor Yellow
 $xdg = @{
@@ -71,17 +73,14 @@ foreach ($key in $xdg.Keys) {
 }
 
 # ============================================
-# ② 基盤ツール導入（git + chezmoi・冪等）
+# nushell 導入（bootstrap.nu を動かすための本体）
 # ============================================
-Write-Host "`n=== 基盤ツール導入 ===" -ForegroundColor Yellow
-Ensure-Tool -Command 'git'     -WingetId 'Git.Git'
-Ensure-Tool -Command 'chezmoi' -WingetId 'twpayne.chezmoi'
+Write-Host "`n=== nushell 導入 ===" -ForegroundColor Yellow
+Ensure-Tool -Command 'nu' -WingetId 'Nushell.Nushell'
 
 # ============================================
-# ③ chezmoi でdotfiles展開＋ツール導入
+# 完了案内
 # ============================================
-Write-Host "`n=== chezmoi で環境構築 ===" -ForegroundColor Yellow
-chezmoi init --apply eda3/dotfiles-chezmoi
-
-Write-Host "`n=== ブートストラップ完了 ===" -ForegroundColor Green
-Write-Host "新しいターミナルを開いて環境を確認してください。" -ForegroundColor Green
+Write-Host "`n=== 下準備 完了 ===" -ForegroundColor Green
+Write-Host "次のコマンドで環境構築を続けてください:" -ForegroundColor Green
+Write-Host "  nu bootstrap.nu" -ForegroundColor Cyan
