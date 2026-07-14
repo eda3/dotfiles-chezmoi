@@ -34,12 +34,12 @@
 #     ($env.NUPM_HOME | path join "modules")
 # ]
 
-$env.PATH = (
-    $env.PATH
-        | split row (char esep)
-        | prepend ($env.NUPM_HOME | path join "scripts")
-        | uniq
-)
+# $env.PATH = (
+#     $env.PATH
+#         | split row (char esep)
+#         | prepend ($env.NUPM_HOME | path join "scripts")
+#         | uniq
+# )
 
 # use ($nu.default-config-dir)/nu_scripts/themes/nu-themes/wez.nu 
 # use ($nu.default-config-dir)/nu_scripts/themes/nu-themes/tokyo-night.nu
