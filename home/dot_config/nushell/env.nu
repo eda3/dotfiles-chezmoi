@@ -30,9 +30,9 @@
 # $env.XDG_STATE_HOME = $env.USERPROFILE | path join '.local' 'state'
 # $env.NUPM_HOME = ($env.XDG_DATA_HOME | path join "nupm")
 
-$env.NU_LIB_DIRS = [
-    ($env.NUPM_HOME | path join "modules")
-]
+# $env.NU_LIB_DIRS = [
+#     ($env.NUPM_HOME | path join "modules")
+# ]
 
 $env.PATH = (
     $env.PATH
