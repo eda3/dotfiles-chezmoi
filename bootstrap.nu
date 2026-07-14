@@ -101,31 +101,95 @@ if $os == "windows" {
     }
 } else if $os == "linux" {
     # =========================================================================
-    # Linux: 【骨組み】導入方式は実機確認して後で埋める
+    # Linux: ツール導入
+    #   方針: 「apt だと古い」を嫌い、Rust製(zellij/helix)は cargo install で
+    #         最新を入れる(えだの実need + cargo 一元管理の意志)。
+    #         非Rust製(git/chezmoi/gh)は apt/公式インストーラ。
+    #   前提: cargo が使えること(install_nu.sh 経由なら rust 導入済み)。
+    #   共用サーバのためログインシェルは変更しない。
     # =========================================================================
-    step "Linux: ツール導入 (未確定・プレースホルダ)"
+    step "Linux: ツール導入"
 
-    warn "Linux 側のツール導入は未実装です (実機確認して埋めてください)。"
-    warn "候補: apt / cargo / GitHubバイナリ直DL (ツールごとに最適解が異なる)。"
+    # --- cargo の存在確認(Rust製ツールの導入に必須) -------------------------
+    if not (has-command "cargo") {
+        warn "cargo が見つかりません。zellij/helix の導入をスキップします。"
+        warn "先に install_nu.sh(rust 導入込み)を実行してください。"
+    }
 
-    # --- 実機確認して埋めるメモ ---------------------------------------------
-    # git     : apt にある想定 (`sudo apt install -y git`)
-    # chezmoi : 公式インストーラ or apt or cargo。VPS(root) で要確認
-    # zellij  : cargo(ビルド長い) or GitHubバイナリ直DL。x86_64 前提
-    # helix   : apt(PPA) or cargo or GitHubバイナリ。%APPDATA%問題はWin側のみ
-    # gh      : apt(GitHub公式リポジトリ登録) が王道
-    #
-    # ※ VPS は root 運用 & 共用サーバ。nushell を cargo で入れた実績(11分半)を踏まえ、
-    #    重いビルドを避けたいものは apt/バイナリを優先する方針で埋める予定。
-    #
-    # for tool in $tools {
-    #     if (has-command $tool.name) {
-    #         info $"[skip] ($tool.name) は既に導入済み"
-    #     } else {
-    #         # TODO: ツールごとの導入コマンドをここに実装
-    #     }
-    # }
+    # --- git (C製 → apt) -----------------------------------------------------
+    if (has-command "git") {
+        info "[skip] git は既に導入済み"
+    } else {
+        info "[install] git を導入中 (apt)..."
+        try {
+            sudo apt-get update
+            sudo apt-get install -y git
+        } catch {
+            warn "git の apt 導入が失敗しました。続行します。"
+        }
+    }
 
+    # --- zellij (Rust製 → cargo install) -------------------------------------
+    # ※ apt 版は古いため cargo で最新を入れる。ビルドに時間がかかる。
+    if (has-command "zellij") {
+        info "[skip] zellij は既に導入済み"
+    } else if (has-command "cargo") {
+        info "[install] zellij を cargo install 中(ビルドに数分〜十数分)..."
+        try {
+            cargo install zellij
+        } catch {
+            warn "zellij の cargo install が失敗しました。続行します。"
+        }
+    }
+
+    # --- helix (Rust製 → cargo install) --------------------------------------
+    # ※ crate 名は helix-term。apt 版は古いため cargo で最新を入れる。
+    # ※【要注意】cargo install だけでは runtime ディレクトリ(構文定義等)が
+    #    入らず、シンタックスハイライトが効かない等の不具合が出うる。
+    #    対処案: 環境変数 HELIX_RUNTIME を runtime の場所に向ける、
+    #            もしくは runtime を ~/.config/helix/runtime へ配置する。
+    #    → ここは実機で確認して必要なら追記する(今は cargo install のみ)。
+    if (has-command "hx") {
+        info "[skip] helix (hx) は既に導入済み"
+    } else if (has-command "cargo") {
+        info "[install] helix を cargo install 中(ビルドに数分〜十数分)..."
+        try {
+            cargo install helix-term
+        } catch {
+            warn "helix の cargo install が失敗しました。続行します。"
+        }
+        warn "helix は runtime 配置が別途必要な場合あり(構文ハイライト等)。実機で要確認。"
+    }
+
+    # --- gh (Go製 → apt: GitHub 公式リポジトリ) ------------------------------
+    # ※ gh は cargo では入らない(Go製)。GitHub 公式の apt リポジトリを使うのが王道。
+    #    公式手順(リポジトリ鍵登録)は環境で変わりうるため、ここは骨組みとして
+    #    「apt に gh があれば入れる」簡易版。無ければ公式手順を実機で追記。
+    if (has-command "gh") {
+        info "[skip] gh は既に導入済み"
+    } else {
+        info "[install] gh を導入中 (apt)..."
+        try {
+            sudo apt-get install -y gh
+        } catch {
+            warn "gh の apt 導入が失敗しました(公式リポジトリ登録が必要な場合あり)。続行します。"
+        }
+    }
+
+    # --- chezmoi (Go製 → 公式インストーラ) -----------------------------------
+    # ※ chezmoi も cargo では入らない(Go製)。公式インストーラが確実。
+    #    root 運用の VPS 前提。BINDIR を /usr/local/bin にして PATH 既通の場所へ。
+    if (has-command "chezmoi") {
+        info "[skip] chezmoi は既に導入済み"
+    } else {
+        info "[install] chezmoi を公式インストーラで導入中..."
+        try {
+            # 公式インストーラを /usr/local/bin へ。root 前提。
+            sh -c 'curl -fsSL https://get.chezmoi.io | sh -s -- -b /usr/local/bin'
+        } catch {
+            warn "chezmoi の公式インストーラが失敗しました。続行します。"
+        }
+    }
 } else {
     # =========================================================================
     # その他OS (macos 等): 現状は対象外
