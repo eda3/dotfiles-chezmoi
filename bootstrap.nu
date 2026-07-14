@@ -48,6 +48,7 @@ let tools = [
     [zellij  "Zellij.Zellij"]
     [helix   "Helix.Helix"]
     [gh      "GitHub.cli"]
+    [carapace "rsteube.Carapace"]
 ]
 
 # ---- コマンドの存在確認ヘルパ -----------------------------------------------

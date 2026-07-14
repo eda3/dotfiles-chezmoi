@@ -17,17 +17,17 @@
 # You can remove these comments if you want or leave
 # them for future reference.
 
-$env.path ++= ['C:\Tools\helix']
+# $env.path ++= ['C:\Tools\helix']
 
 # use ($nu.default-config-dir)/nu_scripts/custom-completions/git/git-completions.nu *
 # use ($nu.default-config-dir)/nu_scripts/custom-completions/eza/eza-completions.nu *
 
 
 
-$env.XDG_CONFIG_HOME = $env.USERPROFILE | path join  '.config'
-$env.XDG_CACHE_HOME = $env.USERPROFILE | path join  '.cache'
-$env.XDG_DATA_HOME = $env.USERPROFILE | path join '.local' 'share'
-$env.XDG_STATE_HOME = $env.USERPROFILE | path join '.local' 'state'
+# $env.XDG_CONFIG_HOME = $env.USERPROFILE | path join  '.config'
+# $env.XDG_CACHE_HOME = $env.USERPROFILE | path join  '.cache'
+# $env.XDG_DATA_HOME = $env.USERPROFILE | path join '.local' 'share'
+# $env.XDG_STATE_HOME = $env.USERPROFILE | path join '.local' 'state'
 
 $env.NUPM_HOME = ($env.XDG_DATA_HOME | path join "nupm")
 
@@ -106,3 +106,9 @@ def --env add-hook [field: cell-path new_hook: any] {
   $env.config = ($old_config | upsert $field ($old_hooks ++ [$new_hook]))
 }
 
+# carapace設定用
+let carapace_init = ($nu.cache-dir | path join carapace.nu)
+if not ($carapace_init | path exists) {
+    mkdir ($nu.cache-dir)
+    carapace _carapace nushell | save --force $carapace_init
+}

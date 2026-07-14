@@ -30,3 +30,6 @@ $env.config = {
 }
 # $env.config.show_banner = true
 $env.config.show_banner = false
+
+# carapace設定用
+source ($nu.cache-dir | path join carapace.nu)
