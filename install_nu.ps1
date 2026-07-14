@@ -7,7 +7,7 @@
     winget前提チェック → XDG環境変数設定 → nushell導入
     この後 `nu bootstrap.nu` を実行してツール導入＋chezmoi展開へ
 .USAGE
-    irm https://raw.githubusercontent.com/eda3/dotfiles-chezmoi/master/install_nu.ps1 | iex
+    irm https://raw.githubusercontent.com/eda3/dotfiles-chezmoi/main/install_nu.ps1 | iex
     その後: nu bootstrap.nu
 #>
 # コケたら止める（原因箇所が分かる）
