@@ -28,8 +28,7 @@
 # $env.XDG_CACHE_HOME = $env.USERPROFILE | path join  '.cache'
 # $env.XDG_DATA_HOME = $env.USERPROFILE | path join '.local' 'share'
 # $env.XDG_STATE_HOME = $env.USERPROFILE | path join '.local' 'state'
-
-$env.NUPM_HOME = ($env.XDG_DATA_HOME | path join "nupm")
+# $env.NUPM_HOME = ($env.XDG_DATA_HOME | path join "nupm")
 
 $env.NU_LIB_DIRS = [
     ($env.NUPM_HOME | path join "modules")
@@ -80,31 +79,6 @@ def ls [
     ) | sort-by type name -i
 }
 
-
-def "parse vars" [] {
-  $in | from csv --noheaders --no-infer | rename 'op' 'name' 'value'
-}
-
-def --env "update-env" [] {
-  for $var in $in {
-    if $var.op == "set" {
-      if ($var.name | str upcase) == 'PATH' {
-        $env.PATH = ($var.value | split row (char esep))
-      } else {
-        load-env {($var.name): $var.value}
-      }
-    } else if $var.op == "hide" and $var.name in $env {
-      hide-env $var.name
-    }
-  }
-}
-
-def --env add-hook [field: cell-path new_hook: any] {
-  let field = $field | split cell-path | update optional true | into cell-path
-  let old_config = $env.config? | default {}
-  let old_hooks = $old_config | get $field | default []
-  $env.config = ($old_config | upsert $field ($old_hooks ++ [$new_hook]))
-}
 
 # carapace設定用
 let carapace_init = ($nu.cache-dir | path join carapace.nu)
