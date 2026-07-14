@@ -191,6 +191,21 @@ if $os == "windows" {
             warn "chezmoi の公式インストーラが失敗しました。続行します。"
         }
     }
+    # --- carapace (Go製 → deb 直DL) -----------------------------------------
+    # ※ carapace は cargo では入らない(Go製)。GitHub releases の .deb を dpkg で。
+    #    バージョンは固定(v1.7.0・2026-05-29 の Latest)。更新時は番号を変える。
+    if (has-command "carapace") {
+        info "[skip] carapace は既に導入済み"
+    } else {
+        info "[install] carapace を deb 直DL で導入中..."
+        try {
+            let deb = "/tmp/carapace.deb"
+            http get "https://github.com/carapace-sh/carapace-bin/releases/download/v1.7.0/carapace-bin_1.7.0_linux_amd64.deb" | save --force $deb
+            sudo dpkg -i $deb
+        } catch {
+            warn "carapace の deb 導入が失敗しました。続行します。"
+        }
+    }
 } else {
     # =========================================================================
     # その他OS (macos 等): 現状は対象外
