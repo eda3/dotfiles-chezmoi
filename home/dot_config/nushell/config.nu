@@ -240,6 +240,7 @@ def --env gl [] {
     cd (ls | where type == dir | get name | str join (char nl) | fzf | decode utf-8 | str trim)
 }
 
+# cd ~\.local\share\chezmoi
 def --env chcd [] {
     chezmoi source-path | str replace 'home' '' |  cd $in;
 }
