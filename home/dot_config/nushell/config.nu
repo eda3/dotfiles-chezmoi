@@ -24,8 +24,62 @@ def cl [] {
 }
 
 $env.config.shell_integration.osc133 = false
-# $env.config.show_banner = true
 $env.config.show_banner = false
+
+def ll [] {ls -l}
+def ltr [] {ls | sort-by modified}
+
+# git系（短縮エイリアス）
+alias gs = git status
+alias gaa = git add -A
+alias gcom = git commit -m 
+alias gl = git log --oneline --graph -20
+alias gf = git diff
+
+
+alias ls-builtin = ls
+# ディレクトリ内の項目のファイル名・サイズ・更新時刻を一覧表示する。
+def ls [
+    --all (-a),         # (-a) 隠しファイルも表示する
+    --long (-l),        # (-l) 各項目の利用可能な全カラムを取得する（低速；カラムはプラットフォーム依存）
+    --short-names (-s), # (-s) パスを含めずファイル名のみ表示する
+    --full-paths (-f),  # (-f) パスを絶対パスで表示する
+    --du (-d),          # (-d) ディレクトリのメタデータサイズの代わりに見かけのディレクトリサイズ（ディスク使用量）を表示する
+    --directory (-D),   # (-D) 指定ディレクトリの中身ではなくディレクトリ自体を一覧表示する
+    --mime-type (-m),   # (-m) type列に'file'の代わりにMIMEタイプを表示する（ファイル名のみに基づく；中身は検査しない）
+    --threads (-t),     # (-t) 複数スレッドで中身を一覧する（出力順は非決定的になる）
+    ...pattern: glob,   # 使用するglobパターン
+]: [ nothing -> table ] {
+    let pattern = if ($pattern | is-empty) { [ '.' ] } else { $pattern }
+    (ls-builtin
+        --all=$all
+        --long=$long
+        --short-names=$short_names
+        --full-paths=$full_paths
+        --du=$du
+        --directory=$directory
+        --mime-type=$mime_type
+        --threads=$threads
+        ...$pattern
+    ) | sort-by type name -i
+}
+
+$env.config.keybindings ++= [
+    {
+        name: completion_menu
+        modifier: control
+        keycode: char_t
+        mode: emacs
+        event: { send: menu name: completion_menu }
+    }
+    {
+        name: history_menu
+        modifier: control
+        keycode: char_r
+        mode: emacs
+        event: { send: menu name: history_menu }
+    }
+]
 
 # carapace設定用
 # ═══════════════════════════════════════════════════════════════════
