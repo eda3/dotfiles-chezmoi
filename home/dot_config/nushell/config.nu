@@ -241,6 +241,5 @@ def --env gl [] {
 }
 
 def --env chcd [] {
-    chezmoi source-path | cd $in;
-    cd ..
+    chezmoi source-path | str replace 'home' '' |  cd $in;
 }
