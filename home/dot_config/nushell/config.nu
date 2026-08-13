@@ -175,3 +175,13 @@ export extern "rg" [
     --type-list                             # サポートされる全ファイルタイプを表示
     --version(-V)                           # rgのバージョンを表示
 ]
+
+# ghq と fzf用
+def --env gf [] {
+  ghq list --full-path | fzf | decode utf-8 | str trim | cd $in
+}
+
+# lsとfzf用
+def --env gl [] {
+  cd (ls | where type == dir | get name | str join (char nl) | fzf | decode utf-8 | str trim)
+}
