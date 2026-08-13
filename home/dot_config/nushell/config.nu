@@ -178,10 +178,14 @@ export extern "rg" [
 
 # ghq と fzf用
 def --env gf [] {
-  ghq list --full-path | fzf | decode utf-8 | str trim | cd $in
+    ghq list --full-path | fzf | decode utf-8 | str trim | cd $in
 }
 
 # lsとfzf用
 def --env gl [] {
-  cd (ls | where type == dir | get name | str join (char nl) | fzf | decode utf-8 | str trim)
+    cd (ls | where type == dir | get name | str join (char nl) | fzf | decode utf-8 | str trim)
+}
+
+def --env chcd [] {
+  chezmoi source-path | cd $in
 }
