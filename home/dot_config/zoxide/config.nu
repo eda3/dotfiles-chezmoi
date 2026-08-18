@@ -53,8 +53,8 @@ export def --env --wrapped __zoxide_zi [...rest: string] {
 # Commands for zoxide. Disable these using --no-cmd.
 #
 
-export alias z = __zoxide_z
-export alias zi = __zoxide_zi
+export alias cd = __zoxide_z
+export alias cdi = __zoxide_zi
 
 # =============================================================================
 #
