@@ -19,6 +19,8 @@
 
 $env.EDITOR = "hx"
 
+source ~/.config/zoxide/config.nu
+
 def cl [] {
   powershell.exe -Command $"Set-Clipboard '($in)'"
 }
